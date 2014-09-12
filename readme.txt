@@ -33,7 +33,7 @@ This plugin can cache google web font to local files.
 
 = Where can I send bug reports? =
 
-Please visit the Bitbucket repository for [Cache Google Font](https://github.com/caijiamx/cache-google-font/)
+Please visit the Github repository for [Cache Google Font](https://github.com/caijiamx/cache-google-font/)
 and open an [issue](https://github.com/caijiamx/cache-google-font/issues).
 
 == Screenshots ==
