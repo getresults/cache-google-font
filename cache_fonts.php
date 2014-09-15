@@ -24,17 +24,34 @@ class CacheFont {
     private $_ttfFile    = 'font.ttf';
 
     public function __construct(){
-        $this->_cacheUrl   = CACHE_GOOGLE_FONT_PLUGIN_URL . $this->_cacheDir;
-        $this->_cacheDir   = CACHE_GOOGLE_FONT_PLUGIN_DIR . $this->_cacheDir;
-        $this->_logFile    = CACHE_GOOGLE_FONT_PLUGIN_DIR . $this->_logFile;
-        $this->loger('$this->_cacheDir = ' . $this->_cacheDir , __FUNCTION__);
-        $this->loger('$this->_cacheUrl = ' . $this->_cacheUrl , __FUNCTION__);
-        $this->loger('$this->_logFile = ' . $this->_logFile , __FUNCTION__);
-        add_filter('style_loader_src', array($this , 'cache_google_font_filter'));
-        add_action( 'admin_notices', array( $this, 'font_notices' ) );
+        add_action( 'admin_notices', array( $this, 'getNotices' ) );
     }
 
-    public function cache_google_font_filter($src){
+    public function checkRequire(){
+        $result = true;
+        $check_functons = array(
+            'file_get_contents',
+            'file_put_contents',
+            'curl_init',
+            'curl_exec',
+            'curl_setopt_array',
+            'curl_close',
+            'opendir',
+            'mkdir',
+            'file_exists',
+            'preg_match',
+            'preg_match_all',
+        )
+        foreach ($check_functons as $function) {
+            if(!function_exists($function)){
+                $this->error("$function 被禁用，请检查您的服务器是否支持该函数！");
+                $result = false;
+            }
+        }
+        return $result;
+    }
+
+    public function cacheGoogleFontFilter($src){
         $url = $this->getUrls($src , true);
         $this->loger('$src = ' . $src , __FUNCTION__);
         $this->loger('$url = ' . $url , __FUNCTION__);
@@ -180,7 +197,16 @@ class CacheFont {
     }
 
     public function run(){
-
+        $result = $this->checkRequire();
+        if($result){
+            $this->_cacheUrl   = CACHE_GOOGLE_FONT_PLUGIN_URL . $this->_cacheDir;
+            $this->_cacheDir   = CACHE_GOOGLE_FONT_PLUGIN_DIR . $this->_cacheDir;
+            $this->_logFile    = CACHE_GOOGLE_FONT_PLUGIN_DIR . $this->_logFile;
+            $this->loger('$this->_cacheDir = ' . $this->_cacheDir , __FUNCTION__);
+            $this->loger('$this->_cacheUrl = ' . $this->_cacheUrl , __FUNCTION__);
+            $this->loger('$this->_logFile = ' . $this->_logFile , __FUNCTION__);
+            add_filter('style_loader_src', array($this , 'cacheGoogleFontFilter'));
+        }
     }
 
     public function error($msg = ''){
@@ -189,7 +215,7 @@ class CacheFont {
         update_option('cache_font_notices', $notices);
     }
 
-    public function font_notices(){
+    public function getNotices(){
         if ($notices= get_option('cache_font_notices')) {
             foreach ($notices as $notice) {
               echo "<div class='error'><p>$notice</p></div>";
