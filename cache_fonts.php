@@ -52,7 +52,7 @@ class CacheFont {
     }
 
     public function cacheGoogleFontFilter($src){
-        $url = $this->getUrls($src , true);
+        $url = $this->getUrls($src);
         $this->loger('$src = ' . $src , __FUNCTION__);
         $this->loger('$url = ' . $url , __FUNCTION__);
         return $url;
