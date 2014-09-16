@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/caijiamx/cache-google-font/
  * Description: This plugin will cache google web font to local files.
  * Author: caijiamx
- * Version: 1.0
+ * Version: 1.1
  * Author URI: http://www.xbc.me
 */
 

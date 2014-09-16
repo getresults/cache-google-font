@@ -40,5 +40,10 @@ and open an [issue](https://github.com/caijiamx/cache-google-font/issues).
 
 == Changelog ==
 
+= Version 1.1 - 16 Sep 2014 =
+* fix cache option
+* fix plugin header format
+* update stable tag to 1.1
+
 = Version 1.0 - 10 Sep 2014 =
 * Initial Release
