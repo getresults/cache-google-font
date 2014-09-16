@@ -1,11 +1,11 @@
 <?php
 /**
-Plugin Name: Cache Google Font
-Plugin URI: https://github.com/caijiamx/cache-google-font/
-Description: This plugin will cache google web font to local files.
-Author: caijiamx
-Version: 1.0
-Author URI: http://www.xbc.me
+ * Plugin Name: Cache Google Font
+ * Plugin URI: https://github.com/caijiamx/cache-google-font/
+ * Description: This plugin will cache google web font to local files.
+ * Author: caijiamx
+ * Version: 1.0
+ * Author URI: http://www.xbc.me
 */
 
 define('CACHE_GOOGLE_FONT_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
