@@ -41,7 +41,7 @@ class CacheFont {
             'file_exists',
             'preg_match',
             'preg_match_all',
-        )
+        );
         foreach ($check_functons as $function) {
             if(!function_exists($function)){
                 $this->error("$function 被禁用，请检查您的服务器是否支持该函数！");
