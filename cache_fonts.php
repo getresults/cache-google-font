@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/caijiamx/cache-google-font/
  * Description: This plugin will cache google web font to local files.
  * Author: caijiamx
- * Version: 1.1
+ * Version: 1.2
  * Author URI: http://www.xbc.me
 */
 
@@ -12,6 +12,7 @@ define('CACHE_GOOGLE_FONT_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 define('CACHE_GOOGLE_FONT_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 
 class CacheFont {
+    public $debug        = false;
     private $_regex  = array(
         'font_url' => "/href='((.+)?fonts\.googleapis\.com([^<].+))' type/" ,
         'ttf_url' => '/url\((.+)\) format/',
@@ -185,10 +186,12 @@ class CacheFont {
     }
 
     public function loger($data , $func){
-        $data = "$func : " . var_export($data ,true) . "\n";
-        $f = file_put_contents($this->_logFile, $data , FILE_APPEND | LOCK_EX);
-        if($f === false){
-            $this->error('写入日志文件失败');
+        if($this->debug){
+            $data = "$func : " . var_export($data ,true) . "\n";
+            $f = file_put_contents($this->_logFile, $data , FILE_APPEND | LOCK_EX);
+            if($f === false){
+                $this->error('写入日志文件失败');
+            }
         }
     }
 

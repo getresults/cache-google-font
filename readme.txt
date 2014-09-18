@@ -1,9 +1,10 @@
 === Cache Google Web Font ===
 Contributors: caijiamx
+Donate link: http://www.xbc.me/donate
 Tags: cache, google, web font
 Requires at least: 2.8
 Tested up to: 4.0.0
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,7 +39,16 @@ and open an [issue](https://github.com/caijiamx/cache-google-font/issues).
 
 == Screenshots ==
 
+no screenshots
+
+== Upgrade Notice ==
+= 1.0 =
+cache google font plugin has released.
+
 == Changelog ==
+= Version 1.2 - 18 Sep 2014 =
+* update plugin to 1.2
+* remove plugin debug option.
 
 = Version 1.1 - 16 Sep 2014 =
 * fix cache option
