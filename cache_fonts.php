@@ -9,16 +9,18 @@
 */
 
 class CacheGoogleFont {
-    const OPTION_USE_CACHE   = 'cache';
-    const OPTION_USE_LIB360  = 'lib360';
-    public  $debug           = false;
-    private $_logFile        = 'cache_fonts.log';
-    private $_fontServer     = 'http://font.xbc.me';
-    private $_cacheDir       = 'cache_fonts';
-    private $_cacheUrl       = '';
-    private $_cssFile        = 'font.css';
-    private $_ttfFile        = 'font.ttf';
-    public  $option          = '';
+    const OPTION_CACHE_USE_LOCAL  = 'cache';
+    const OPTION_CACHE_USE_LIB360 = 'lib360';
+    const OPTION_CACHE_KEY        = 'cache_font_option';
+    const OPTION_DEBUG_KEY        = 'cache_font_debug';
+    public  $debug                = 0;
+    public  $option               = '';
+    private $_logFile             = 'cache_fonts.log';
+    private $_fontServer          = 'http://font.xbc.me';
+    private $_cacheDir            = 'cache_fonts';
+    private $_cacheUrl            = '';
+    private $_cssFile             = 'font.css';
+    private $_ttfFile             = 'font.ttf';
     private $_regex          = array(
         'font_url' => "/href='((.+)?fonts\.googleapis\.com([^<].+))' type/" ,
         'ttf_url'  => '/url\((.+)\) format/',
@@ -56,21 +58,18 @@ class CacheGoogleFont {
     }
 
     public function cacheGoogleFontFilter($src){
-        //defaul option
-        $default=  self::OPTION_USE_CACHE;
-        $option = get_option('cache_font_option', $default);
-        $url = $this->getUrl($src , $option);
+        $url = $this->getUrl($src);
         $this->loger('$src = ' . $src , __FUNCTION__);
         $this->loger('$url = ' . $url , __FUNCTION__);
         return $url;
     }
 
-    public function getUrl($url , $option){
-        switch ($option) {
-            case OPTION_USE_CACHE:
+    public function getUrl($url){
+        switch ($this->option) {
+            case self::OPTION_CACHE_USE_LOCAL:
                 return $this->getUrlByCache($url);
                 break;
-            case OPTION_USE_LIB360:
+            case self::OPTION_CACHE_USE_LIB360:
                 return $this->getUrlByLib360($url);
                 break;
             default:
@@ -230,15 +229,25 @@ class CacheGoogleFont {
     public function run(){
         $result = $this->checkRequire();
         if($result){
+            //初始化相关插件信息
             $plugin_dir        = plugin_dir_path( __FILE__ );
             $plugin_url        = plugin_dir_url( __FILE__ );
             $this->_cacheUrl   = $plugin_url . $this->_cacheDir;
             $this->_cacheDir   = $plugin_dir . $this->_cacheDir;
             $this->_logFile    = $plugin_dir . $this->_logFile;
+            //初始化设定选项
+            $this->debug       = get_option(self::OPTION_DEBUG_KEY , 0 );
+            $this->option      = get_option(self::OPTION_CACHE_KEY , self::OPTION_CACHE_USE_LOCAL);
+            //日志
             $this->loger('$this->_cacheDir = ' . $this->_cacheDir , __FUNCTION__);
             $this->loger('$this->_cacheUrl = ' . $this->_cacheUrl , __FUNCTION__);
             $this->loger('$this->_logFile = ' . $this->_logFile , __FUNCTION__);
+            $this->loger('$this->debug = ' . $this->debug , __FUNCTION__);
+            $this->loger('$this->option = ' . $this->option , __FUNCTION__);
+            //添加load style filter
             add_filter('style_loader_src', array($this , 'cacheGoogleFontFilter'));
+            //add admin page
+            add_action('admin_menu', array($this , 'addSettingPage'));
         }
     }
 
@@ -256,7 +265,77 @@ class CacheGoogleFont {
             delete_option('cache_font_notices');
         }
     }
+
+    public function addSettingPage(){
+        //add menu option page
+        add_options_page(
+            'Cache Google Font',
+            'Cache Google Font',
+            'manage_options',
+            'cache_google_font_settings',
+            array($this ,'cacheFontCustomOptions'));
+        //call register settings function
+        add_action( 'admin_init', array( $this , 'registerCacheFontSettings') );
+    }
+
+    public function registerCacheFontSettings(){
+        //register our settings
+        register_setting( 'cache-font-settings-group', self::OPTION_CACHE_KEY );
+        register_setting( 'cache-font-settings-group', self::OPTION_DEBUG_KEY );
+    }
+
+    public function cacheFontCustomOptions(){
+        _cacheFontCustomOptions();
+    }
 }
 
 $font = new CacheGoogleFont();
 $font->run();
+
+function _cacheFontCustomOptions(){
+    $options = array(
+        'cache'  => '我要缓存到本地',
+        'lib360' => '使用360前端公共库CDN服务'
+    );
+    $debug   = array(
+        '1' => '开启',
+        '0' => '关闭',
+    );
+    $option_key    =  CacheGoogleFont::OPTION_CACHE_KEY;
+    $debug_key     =  CacheGoogleFont::OPTION_DEBUG_KEY;
+    $option_select = get_option($option_key);
+    $debug_select  = get_option($debug_key);
+    ?>
+<div class="wrap">
+    <h2>缓存Google字体选项</h2>
+    <form method="post" action="options.php">
+        <?php settings_fields( 'cache-font-settings-group' ); ?>
+        <?php do_settings_sections( 'cache-font-settings-group' ); ?>
+        <table class="form-table">
+            <tr valign="top">
+                <th scope="row">缓存</th>
+                <td>
+                    <select name="<?php echo $option_key;?>" id="<?php echo $option_key;?>">
+                    <?php foreach ($options as $k => $v) { ?>
+                        <option value="<?php echo $k;?>" <?php if ($option_select == $k) { echo 'selected="selected"'; } ?>><?php echo $v; ?></option>
+                    <?php } ?>
+                    </select>
+                    <p class="description"><?php _e('选择缓存字体的方式'); ?></p>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row">调试</th>
+                <td>
+                <select name="<?php echo $debug_key;?>" id="<?php echo $debug_key;?>">
+                <?php foreach ($debug as $k => $v) { ?>
+                        <option value="<?php echo $k;?>" <?php if ($debug_select == $k) { echo 'selected="selected"'; } ?>><?php echo $v; ?></option>
+                <?php } ?>
+                </select>
+                <p class="description"><?php _e('是否记录相关日志'); ?></p>
+                </td>
+            </tr>
+        </table>
+        <?php submit_button(); ?>
+    </form>
+</div>
+<?php }?>
