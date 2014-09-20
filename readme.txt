@@ -4,7 +4,7 @@ Donate link: http://www.xbc.me/donate
 Tags: cache, google, web font
 Requires at least: 2.8
 Tested up to: 4.0.0
-Stable tag: 1.2
+Stable tag: 1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,10 @@ no screenshots
 cache google font plugin has released.
 
 == Changelog ==
+= Version 1.3 - 20 Sep 2014 =
+* rename plugin to CacheGoogleFont.
+* add cache option.you can use fonts.useso.com now.
+
 = Version 1.2 - 18 Sep 2014 =
 * update plugin to 1.2
 * remove plugin debug option.

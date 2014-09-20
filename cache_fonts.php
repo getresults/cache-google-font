@@ -4,25 +4,28 @@
  * Plugin URI: https://github.com/caijiamx/cache-google-font/
  * Description: This plugin will cache google web font to local files.
  * Author: caijiamx
- * Version: 1.2
+ * Version: 1.3
  * Author URI: http://www.xbc.me
 */
 
-define('CACHE_GOOGLE_FONT_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
-define('CACHE_GOOGLE_FONT_PLUGIN_URL', plugin_dir_url( __FILE__ ));
-
-class CacheFont {
-    public $debug        = false;
-    private $_regex  = array(
+class CacheGoogleFont {
+    const OPTION_USE_CACHE   = 'cache';
+    const OPTION_USE_LIB360  = 'lib360';
+    public  $debug           = false;
+    private $_logFile        = 'cache_fonts.log';
+    private $_fontServer     = 'http://font.xbc.me';
+    private $_cacheDir       = 'cache_fonts';
+    private $_cacheUrl       = '';
+    private $_cssFile        = 'font.css';
+    private $_ttfFile        = 'font.ttf';
+    public  $option          = '';
+    private $_regex          = array(
         'font_url' => "/href='((.+)?fonts\.googleapis\.com([^<].+))' type/" ,
-        'ttf_url' => '/url\((.+)\) format/',
+        'ttf_url'  => '/url\((.+)\) format/',
+        'lib360'   => array(
+            '/fonts\.googleapis\.com/' => 'fonts.useso.com',
+        ),
     );
-    private $_logFile    = 'cache_fonts.log';
-    private $_fontServer = 'http://font.xbc.me';
-    private $_cacheDir   = 'cache_fonts';
-    private $_cacheUrl   = '';
-    private $_cssFile    = 'font.css';
-    private $_ttfFile    = 'font.ttf';
 
     public function __construct(){
         add_action( 'admin_notices', array( $this, 'getNotices' ) );
@@ -53,13 +56,30 @@ class CacheFont {
     }
 
     public function cacheGoogleFontFilter($src){
-        $url = $this->getUrls($src);
+        //defaul option
+        $default=  self::OPTION_USE_CACHE;
+        $option = get_option('cache_font_option', $default);
+        $url = $this->getUrl($src , $option);
         $this->loger('$src = ' . $src , __FUNCTION__);
         $this->loger('$url = ' . $url , __FUNCTION__);
         return $url;
     }
 
-    public function getUrls($url , $noCache = false){
+    public function getUrl($url , $option){
+        switch ($option) {
+            case OPTION_USE_CACHE:
+                return $this->getUrlByCache($url);
+                break;
+            case OPTION_USE_LIB360:
+                return $this->getUrlByLib360($url);
+                break;
+            default:
+                return $this->getUrlByCache($url);
+                break;
+        }
+    }
+
+    public function getUrlByCache($url){
         $local_url = false;
         if(empty($url)){
             return false;
@@ -82,7 +102,7 @@ class CacheFont {
         $local_url = "{$this->_cacheUrl}/css/{$key}/{$this->_cssFile}";
         $this->loger('$file = ' . $file , __FUNCTION__);
         $this->loger('$local_url = ' . $local_url , __FUNCTION__);
-        if($file && $noCache === false){
+        if($file && $this->debug === false){
             return $local_url;
         }
         $css_file = $this->getContents($post , 'css');
@@ -185,6 +205,14 @@ class CacheFont {
         return $dir;
     }
 
+    public function getUrlByLib360($url){
+        $regexs = $this->_regex['lib360'];
+        foreach ($regexs as $key => $value) {
+            $url = preg_replace($key, $value, $url);
+        }
+        return $url;
+    }
+
     public function loger($data , $func){
         if($this->debug){
             $data = "$func : " . var_export($data ,true) . "\n";
@@ -202,9 +230,11 @@ class CacheFont {
     public function run(){
         $result = $this->checkRequire();
         if($result){
-            $this->_cacheUrl   = CACHE_GOOGLE_FONT_PLUGIN_URL . $this->_cacheDir;
-            $this->_cacheDir   = CACHE_GOOGLE_FONT_PLUGIN_DIR . $this->_cacheDir;
-            $this->_logFile    = CACHE_GOOGLE_FONT_PLUGIN_DIR . $this->_logFile;
+            $plugin_dir        = plugin_dir_path( __FILE__ );
+            $plugin_url        = plugin_dir_url( __FILE__ );
+            $this->_cacheUrl   = $plugin_url . $this->_cacheDir;
+            $this->_cacheDir   = $plugin_dir . $this->_cacheDir;
+            $this->_logFile    = $plugin_dir . $this->_logFile;
             $this->loger('$this->_cacheDir = ' . $this->_cacheDir , __FUNCTION__);
             $this->loger('$this->_cacheUrl = ' . $this->_cacheUrl , __FUNCTION__);
             $this->loger('$this->_logFile = ' . $this->_logFile , __FUNCTION__);
@@ -228,5 +258,5 @@ class CacheFont {
     }
 }
 
-$font = new CacheFont();
+$font = new CacheGoogleFont();
 $font->run();
