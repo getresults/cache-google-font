@@ -10,7 +10,7 @@
 
 /* Let's get set up for localisation */
 
-load_plugin_textdomain('cache-google-font', false, basename( dirname( __FILE__ ) ) . '/Languages' );
+load_plugin_textdomain('cache-google-font', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 function ap_action_init()
 {
@@ -322,7 +322,7 @@ function _cacheFontCustomOptions(){
     $debug_select  = get_option($debug_key);
     ?>
 <div class="wrap">
-    <<h2><?php echo __('缓存Google字体选项','cache-google-font'); ?></h2>
+    <h2><?php echo __('缓存Google字体选项','cache-google-font');?></h2>
     <form method="post" action="options.php">
         <?php settings_fields( 'cache-font-settings-group' ); ?>
         <?php do_settings_sections( 'cache-font-settings-group' ); ?>
