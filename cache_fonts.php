@@ -6,6 +6,8 @@
  * Author: caijiamx
  * Version: 1.3
  * Author URI: http://www.xbc.me
+ * Text Domain: cache-google-font
+ * Domain Path: /languages/
 */
 
 /* Let's get set up for localisation */
@@ -65,7 +67,7 @@ class CacheGoogleFont {
         );
         foreach ($check_functons as $function) {
             if(!function_exists($function)){
-                $this->error("$function " . __('被禁用，请检查您的服务器是否支持该函数','cache-google-font'));
+                $this->error("$function " . __('Disabled. Please check your server supports this function.','cache-google-font'));
                 $result = false;
             }
         }
@@ -145,7 +147,7 @@ class CacheGoogleFont {
                         $result = str_replace($google_url, $new_url, $css);
                         $f = file_put_contents($css_file, $result , LOCK_EX);
                         if($f === false){
-                            return $this->error(__('更新ccs 文件失败','cache-google-font'));
+                            return $this->error(__('Update of CSS file failed','cache-google-font'));
                         }
                     }
                 }
@@ -173,7 +175,7 @@ class CacheGoogleFont {
             $result = curl_exec($ch);
             curl_close($ch);
             if(! $result ){
-                return $this->error(__('获取字体信息失败','cache-google-font'));
+                return $this->error(__('Failed to get font information','cache-google-font'));
             }
             $cache_dir = $this->getCacheDir($key , $type);
             $this->loger('$cache_dir = ' . $cache_dir , __FUNCTION__);
@@ -182,7 +184,7 @@ class CacheGoogleFont {
             if(! $dh){
                 $mk =  @mkdir($cache_dir , 0755 , true);
                 if(! $mk){
-                    return $this->error(__('创建缓存目录失败','cache-google-font'));
+                    return $this->error(__('Failed to create cache directory','cache-google-font'));
                 }
             }
             $filename = $this->_cssFile;
@@ -193,7 +195,7 @@ class CacheGoogleFont {
             $this->loger('$file = ' . $file , __FUNCTION__);
             $f = file_put_contents($file, $result , LOCK_EX);
             if($f === false){
-                return $this->error(__('写入缓存文件失败','cache-google-font'));
+                return $this->error(__('Failed to write cache file','cache-google-font'));
             }
         }
         return $file;
@@ -232,7 +234,7 @@ class CacheGoogleFont {
             $data = "$func : " . var_export($data ,true) . "\n";
             $f = file_put_contents($this->_logFile, $data , FILE_APPEND | LOCK_EX);
             if($f === false){
-                $this->error(__('写入日志文件失败','cache-google-font'));
+                $this->error(__('Failed to write log file','cache-google-font'));
             }
         }
     }
@@ -309,12 +311,12 @@ $font->run();
 
 function _cacheFontCustomOptions(){
     $options = array(
-        'cache'  => __('我要缓存到本地','cache-google-font'),
-        'lib360' => __('使用360前端公共库CDN服务','cache-google-font')
+        'cache'  => __('I want to cache locally','cache-google-font'),
+        'lib360' => __('Use 360.cn public CDN Service','cache-google-font')
     );
     $debug   = array(
-        '1' => __('开启','cache-google-font'),
-        '0' => __('关闭','cache-google-font'),
+        '1' => __('On','cache-google-font'),
+        '0' => __('Off','cache-google-font'),
     );
     $option_key    =  CacheGoogleFont::OPTION_CACHE_KEY;
     $debug_key     =  CacheGoogleFont::OPTION_DEBUG_KEY;
@@ -322,31 +324,31 @@ function _cacheFontCustomOptions(){
     $debug_select  = get_option($debug_key);
     ?>
 <div class="wrap">
-    <h2><?php echo __('缓存Google字体选项','cache-google-font');?></h2>
+    <h2><?php echo __('Cache Google Font Options','cache-google-font');?></h2>
     <form method="post" action="options.php">
         <?php settings_fields( 'cache-font-settings-group' ); ?>
         <?php do_settings_sections( 'cache-font-settings-group' ); ?>
         <table class="form-table">
             <tr valign="top">
-                <th scope="row"><?php __('缓存','cache-google-font'); ?></th>
+                <th scope="row"><?php __('Cache','cache-google-font'); ?></th>
                 <td>
                     <select name="<?php echo $option_key;?>" id="<?php echo $option_key;?>">
                     <?php foreach ($options as $k => $v) { ?>
                         <option value="<?php echo $k;?>" <?php if ($option_select == $k) { echo 'selected="selected"'; } ?>><?php echo $v; ?></option>
                     <?php } ?>
                     </select>
-                    <p class="description"><?php echo __('选择缓存字体的方式','cache-google-font'); ?></p>
+                    <p class="description"><?php echo __('Select the font cache mode','cache-google-font'); ?></p>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php echo __('调试','cache-google-font'); ?></th>
+                <th scope="row"><?php echo __('Debugging','cache-google-font'); ?></th>
                 <td>
                 <select name="<?php echo $debug_key;?>" id="<?php echo $debug_key;?>">
                 <?php foreach ($debug as $k => $v) { ?>
                         <option value="<?php echo $k;?>" <?php if ($debug_select == $k) { echo 'selected="selected"'; } ?>><?php echo $v; ?></option>
                 <?php } ?>
                 </select>
-                <p class="description"><?php echo __('是否记录相关日志','cache-google-font'); ?></p>
+                <p class="description"><?php echo __('Debug Log','cache-google-font'); ?></p>
                 </td>
             </tr>
         </table>
